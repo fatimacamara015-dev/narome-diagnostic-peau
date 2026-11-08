@@ -4,57 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Narome – Diagnostic de peau</title>
-  <meta name="description" content="Réponds à 7 questions et découvre la gamme Narome adaptée à ta peau : acnéique, sèche, mature ou grasse.">
+  <meta name="description" content="Réponds à 7 questions et découvre la routine Narome adaptée à ta peau : acnéique, sèche, mature ou grasse.">
   <style>
+    /* Identité reprise du site narome-senegal.com : fond blanc, texte et boutons #333, coins arrondis 16px, Arial */
     :root {
-      --cream: #faf5ef;
+      --bg: #f6f6f4;
       --paper: #ffffff;
-      --ink: #2b2420;
-      --muted: #7a6d64;
-      --line: #eadfd3;
-      --accent: #b5654a;      /* terracotta */
-      --accent-dark: #8f4c36;
-      --accent-soft: #f3e3da;
+      --ink: #333333;
+      --muted: #777777;
+      --line: #e6e6e3;
+      --accent: #333333;
+      --accent-hover: #4f4f4f;
+      --soft: #efefec;
       --radius: 16px;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--cream);
+      font-family: Arial, Helvetica, Verdana, sans-serif;
+      background: var(--bg);
       color: var(--ink);
       line-height: 1.5;
     }
-    header {
+    .topbar {
+      background: var(--accent);
+      color: #fff;
       text-align: center;
-      padding: 28px 16px 8px;
+      font-size: 0.8rem;
+      padding: 8px 12px;
     }
-    .logo {
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 1.9rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--accent-dark);
-      margin: 0;
-      padding-left: 0.35em; /* compense l'espacement de la dernière lettre */
-    }
-    .tagline { margin: 4px 0 0; color: var(--muted); font-size: 0.95rem; }
+    header { text-align: center; padding: 24px 16px 4px; }
+    header img { height: 44px; width: auto; }
+    .logo-fallback { font-size: 1.6rem; letter-spacing: 0.3em; font-weight: bold; margin: 0; }
+    .tagline { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
 
-    main { max-width: 640px; margin: 0 auto; padding: 16px; }
+    main { max-width: 680px; margin: 0 auto; padding: 16px; }
     .card {
       background: var(--paper);
       border-radius: var(--radius);
       padding: 28px 24px;
-      box-shadow: 0 2px 14px rgba(80, 50, 30, 0.08);
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
     }
-    h1, h2 {
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: normal;
-      line-height: 1.2;
-      margin: 0 0 12px;
-    }
-    h1 { font-size: 1.8rem; }
-    h2 { font-size: 1.4rem; }
+    h1, h2 { line-height: 1.2; margin: 0 0 12px; }
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.3rem; }
     p { margin: 0 0 16px; }
     .muted { color: var(--muted); }
 
@@ -62,134 +55,111 @@
       list-style: none; padding: 0; margin: 20px 0 24px;
       display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
     }
-    .types li {
-      background: var(--accent-soft);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 0.95rem;
-    }
+    .types li { background: var(--soft); border-radius: 12px; padding: 12px 14px; font-size: 0.95rem; }
 
     button, .btn {
       font: inherit;
       cursor: pointer;
-      border: none;
-      border-radius: 999px;
-      padding: 14px 28px;
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 13px 26px;
       background: var(--accent);
       color: #fff;
-      font-weight: 600;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
       transition: background 0.15s;
     }
-    button:hover { background: var(--accent-dark); }
-    button.secondary {
-      background: transparent;
-      color: var(--accent-dark);
-      border: 1.5px solid var(--accent);
-    }
-    button.secondary:hover { background: var(--accent-soft); }
-    button:disabled { opacity: 0.45; cursor: not-allowed; }
-    button:focus-visible, input:focus-visible + span {
-      outline: 3px solid var(--accent); outline-offset: 2px;
-    }
+    button:hover, .btn:hover { background: var(--accent-hover); }
+    button.secondary, .btn.secondary { background: transparent; color: var(--accent); }
+    button.secondary:hover, .btn.secondary:hover { background: var(--soft); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button:focus-visible, a:focus-visible, input:focus-visible + span { outline: 3px solid #1a73e8; outline-offset: 2px; }
 
-    .progress {
-      height: 6px; background: var(--line); border-radius: 99px; overflow: hidden;
-      margin-bottom: 8px;
-    }
+    .progress { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
     .progress > div { height: 100%; background: var(--accent); width: 0; transition: width 0.25s; }
     .step { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; }
 
     fieldset { border: 0; padding: 0; margin: 0 0 24px; }
-    legend { font-family: Georgia, serif; font-size: 1.35rem; padding: 0; margin-bottom: 16px; }
+    legend { font-size: 1.25rem; font-weight: bold; padding: 0; margin-bottom: 16px; }
     .option { display: block; margin-bottom: 10px; }
     .option input { position: absolute; opacity: 0; }
     .option span {
-      display: block;
-      padding: 14px 16px;
-      border: 1.5px solid var(--line);
-      border-radius: 12px;
-      cursor: pointer;
+      display: block; padding: 14px 16px;
+      border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
     }
     .option span:hover { border-color: var(--accent); }
-    .option input:checked + span {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      font-weight: 600;
-    }
+    .option input:checked + span { border-color: var(--accent); background: var(--soft); font-weight: bold; }
     .nav { display: flex; justify-content: space-between; gap: 12px; }
 
     /* Résultat */
     .badge {
-      display: inline-block;
-      background: var(--accent-soft);
-      color: var(--accent-dark);
-      border-radius: 999px;
-      padding: 4px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 12px;
+      display: inline-block; background: var(--soft); border-radius: 999px;
+      padding: 4px 12px; font-size: 0.8rem; font-weight: bold; margin-bottom: 12px;
+      text-transform: uppercase; letter-spacing: 0.05em;
     }
-    .gamme {
-      border-left: 4px solid var(--accent);
-      background: var(--cream);
-      border-radius: 0 12px 12px 0;
-      padding: 14px 16px;
-      margin: 20px 0;
+    .note { background: var(--soft); border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; margin: 16px 0; }
+    .products { list-style: none; padding: 0; margin: 12px 0 0; }
+    .product {
+      display: grid; grid-template-columns: 84px 1fr; gap: 14px;
+      padding: 16px 0; border-bottom: 1px solid var(--line);
     }
-    .gamme h3 { margin: 0 0 4px; font-family: Georgia, serif; font-weight: normal; font-size: 1.25rem; }
-    .gamme p { margin: 0; color: var(--muted); }
-    .routine { list-style: none; padding: 0; margin: 0 0 20px; counter-reset: etape; }
-    .routine li {
-      counter-increment: etape;
-      display: flex; gap: 14px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--line);
+    .product img {
+      width: 84px; height: 84px; object-fit: cover; border-radius: 12px; background: var(--soft);
     }
-    .routine li::before {
-      content: counter(etape);
-      flex: none;
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--accent); color: #fff;
-      display: grid; place-items: center;
-      font-size: 0.85rem; font-weight: 700;
-    }
-    .routine strong { display: block; }
-    .routine small { color: var(--muted); }
-    .scores { margin: 20px 0 8px; }
+    .etape { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+    .product h3 { margin: 2px 0 2px; font-size: 1.05rem; }
+    .product .compo { font-size: 0.85rem; color: var(--muted); margin: 0 0 6px; }
+    .product .why { font-size: 0.92rem; margin: 0 0 8px; }
+    .product .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .prix { font-weight: bold; }
+    .product a.lien { font-size: 0.9rem; color: var(--ink); }
+    .optionnel { font-size: 0.7rem; background: var(--soft); border-radius: 99px; padding: 2px 8px; margin-left: 6px; text-transform: none; letter-spacing: 0; }
+    .total { display: flex; justify-content: space-between; font-weight: bold; padding: 16px 0 4px; font-size: 1.05rem; }
+    .livraison { font-size: 0.9rem; color: var(--muted); margin-bottom: 4px; }
+    .bonus { margin-top: 24px; }
+    .scores { margin: 24px 0 8px; }
     .score-row { display: grid; grid-template-columns: 110px 1fr 44px; gap: 10px; align-items: center; font-size: 0.9rem; margin-bottom: 6px; }
     .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
     .bar > div { height: 100%; background: var(--accent); }
-    .secondary-note { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; font-size: 0.92rem; margin-bottom: 16px; }
-    .disclaimer { font-size: 0.8rem; color: var(--muted); margin-top: 24px; }
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .disclaimer { font-size: 0.8rem; color: var(--muted); margin-top: 24px; }
 
     [hidden] { display: none !important; }
     footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding: 16px 16px 32px; }
+    footer a { color: inherit; }
 
     @media (max-width: 420px) {
       .card { padding: 22px 16px; }
       .types { grid-template-columns: 1fr; }
       .score-row { grid-template-columns: 90px 1fr 40px; }
+      .product { grid-template-columns: 68px 1fr; }
+      .product img { width: 68px; height: 68px; }
     }
   </style>
 </head>
 <body>
+  <div class="topbar">Livraison gratuite à partir de 25 000 FCFA · Produits certifiés ISO 22716</div>
   <header>
-    <p class="logo">Narome</p>
-    <p class="tagline">Soins de la peau</p>
+    <a href="https://narome-senegal.com" aria-label="Narome Sénégal">
+      <img src="https://narome-senegal.com/wp-content/uploads/2025/06/cropped-NOIR-Logo_Narome-scaled-1.jpg-removebg-preview-300x75.png"
+           alt="Narome"
+           onerror="this.replaceWith(Object.assign(document.createElement('p'),{className:'logo-fallback',textContent:'NAROME'}))">
+    </a>
+    <p class="tagline">Diagnostic de peau</p>
   </header>
 
   <main>
     <!-- Accueil -->
     <section id="accueil" class="card">
-      <h1>Quelle est la routine faite pour ta peau&nbsp;?</h1>
-      <p class="muted">Réponds à 7 questions rapides (moins de 2 minutes). Nous t'indiquons ton type de peau et la gamme Narome qui lui correspond.</p>
+      <h1>Quelle routine Narome est faite pour ta peau&nbsp;?</h1>
+      <p class="muted">Réponds à 7 questions rapides (moins de 2 minutes). Nous t'indiquons ton type de peau et les soins Narome qui lui correspondent.</p>
       <ul class="types">
-        <li>🌿 Peau à tendance acnéique</li>
-        <li>💧 Peau sèche</li>
-        <li>✨ Peau mature</li>
-        <li>🍃 Peau grasse</li>
+        <li>Peau à tendance acnéique</li>
+        <li>Peau sèche</li>
+        <li>Peau mature</li>
+        <li>Peau grasse</li>
       </ul>
       <button id="start">Commencer le diagnostic</button>
     </section>
@@ -211,68 +181,101 @@
     <section id="resultat" class="card" hidden aria-live="polite"></section>
   </main>
 
-  <footer>© Narome – Diagnostic indicatif, ne remplace pas l'avis d'un professionnel de santé.</footer>
+  <footer>
+    <p>Narome Sénégal · 17, Cité Magistrats, Mamelles · +221 33 820 91 20 ·
+      <a href="https://narome-senegal.com">narome-senegal.com</a></p>
+    <p>Diagnostic indicatif, il ne remplace pas l'avis d'un professionnel de santé.</p>
+  </footer>
 
   <script>
-    /* ---------- Données ---------- */
-
-    // Les 4 types de peau (clés utilisées dans le score)
-    const TYPES = {
-      acne: {
-        nom: "Peau à tendance acnéique",
-        gamme: "Gamme Pure",
-        intro: "Ta peau produit du sébum en excès et les pores ont tendance à s'obstruer : imperfections, points noirs, parfois des rougeurs. L'objectif est de purifier sans agresser.",
-        actifs: "Acide salicylique, zinc, niacinamide",
-        routine: [
-          { nom: "Gel nettoyant purifiant", detail: "Matin et soir, à l'eau tiède. Sans savon décapant." },
-          { nom: "Sérum anti-imperfections", detail: "Le soir, sur peau propre. Cible les boutons et les points noirs." },
-          { nom: "Crème matifiante non comédogène", detail: "Matin et soir. Hydrate sans laisser de film gras." },
-          { nom: "Protection solaire SPF 50 fluide", detail: "Chaque matin, même par temps nuageux." }
-        ],
-        conseil: "Évite de percer les boutons et de gommer trop souvent : cela irrite et peut laisser des marques. En cas d'acné sévère ou persistante, consulte un dermatologue."
+    /* ---------- Produits Narome (relevés sur narome-senegal.com le 8 nov. 2026) ---------- */
+    const BASE = "https://narome-senegal.com";
+    const UP = BASE + "/wp-content/uploads/";
+    const PRODUITS = {
+      gel: {
+        nom: "Gel nettoyant", prix: 7000,
+        compo: "Niacinamide, extrait de réglisse, sans sulfates · 200 ml",
+        url: BASE + "/product/gel-nettoyant/", img: UP + "2025/06/gel-nettoyant-image.webp"
       },
-      seche: {
-        nom: "Peau sèche",
-        gamme: "Gamme Confort",
-        intro: "Ta peau manque de lipides et d'eau : elle tiraille, peut être terne ou présenter des zones rugueuses. L'objectif est de nourrir et de renforcer la barrière cutanée.",
-        actifs: "Acide hyaluronique, céramides, beurre de karité",
-        routine: [
-          { nom: "Huile ou lait nettoyant doux", detail: "Matin et soir. Respecte le film hydrolipidique de la peau." },
-          { nom: "Sérum hydratant à l'acide hyaluronique", detail: "Matin et soir, sur peau légèrement humide." },
-          { nom: "Crème nourrissante aux céramides", detail: "Matin et soir. Une couche plus riche le soir." },
-          { nom: "Protection solaire SPF 50 crème", detail: "Chaque matin, texture confort." }
-        ],
-        conseil: "Privilégie l'eau tiède plutôt que chaude et applique tes soins sur peau encore humide pour retenir l'hydratation."
+      huile: {
+        nom: "Huile démaquillante", prix: 8900,
+        compo: "Huiles végétales et vitamine E · 50 ml",
+        url: BASE + "/product/huile-demaquillante/", img: UP + "2025/06/huile-demaquillante.webp"
       },
-      mature: {
-        nom: "Peau mature",
-        gamme: "Gamme Éclat Jeunesse",
-        intro: "Avec le temps, le renouvellement cellulaire ralentit : rides, perte de fermeté et teint moins lumineux apparaissent. L'objectif est de stimuler, repulper et protéger.",
-        actifs: "Rétinol, peptides, vitamine C",
-        routine: [
-          { nom: "Crème nettoyante douce", detail: "Matin et soir, sans frotter." },
-          { nom: "Sérum vitamine C", detail: "Le matin. Booste l'éclat et protège des agressions." },
-          { nom: "Soin de nuit au rétinol et aux peptides", detail: "Le soir. Lisse les rides et améliore la fermeté. Introduis-le progressivement." },
-          { nom: "Crème de jour + SPF 50", detail: "Chaque matin. Le soleil est la première cause du vieillissement cutané." }
-        ],
-        conseil: "Le rétinol se commence 2 à 3 soirs par semaine, puis on augmente. Évite-le si tu es enceinte ou que tu allaites."
+      lotion: {
+        nom: "Lotion tonifiante", prix: 7000,
+        compo: "Vitamine B12, niacinamide, extrait de calendula · 50 ml",
+        url: BASE + "/product/lotion-tonifiante/", img: UP + "2025/06/lotion-tonifiante.webp"
       },
-      grasse: {
-        nom: "Peau grasse",
-        gamme: "Gamme Équilibre",
-        intro: "Ta peau produit beaucoup de sébum : brillance, pores visibles, surtout sur le front, le nez et le menton. L'objectif est de réguler et matifier, tout en gardant la peau hydratée.",
-        actifs: "Niacinamide, argile, zinc PCA",
-        routine: [
-          { nom: "Mousse nettoyante équilibrante", detail: "Matin et soir. Élimine l'excès de sébum en douceur." },
-          { nom: "Sérum niacinamide resserrant les pores", detail: "Matin et soir. Régule le sébum et affine le grain de peau." },
-          { nom: "Gel-crème hydratant matifiant", detail: "Matin et soir. Une peau grasse a aussi besoin d'eau." },
-          { nom: "Protection solaire SPF 50 toucher sec", detail: "Chaque matin." }
-        ],
-        conseil: "Ne décape pas ta peau : trop la dégraisser la pousse à produire encore plus de sébum. Un masque à l'argile 1 fois par semaine suffit."
+      serum: {
+        nom: "Sérum apaisant N°1", prix: 10000,
+        compo: "Vitamine B12, niacinamide, acide hyaluronique · 30 ml",
+        url: BASE + "/product/serum-apaisant-n1/", img: UP + "2025/06/serum-apaisant.webp"
+      },
+      creme: {
+        nom: "Crème hydra-protect", prix: 12500,
+        compo: "Bouclier anti-lumière bleue, complexe glucidique, niacinamide · 50 ml",
+        url: BASE + "/product/creme-hydra-protect/", img: UP + "2025/06/creme-hydra-protect.webp"
+      },
+      charbon: {
+        nom: "Savon détoxifiant au charbon", prix: 5000,
+        compo: "Charbon actif, huiles essentielles, karité et huile d'olive saponifiés",
+        url: BASE + "/product/savon-detoxifiant-au-charbon/", img: UP + "2025/07/savon-detoxifiant.webp"
       }
     };
 
-    // Questions : chaque réponse ajoute des points aux types concernés
+    /* ---------- Les 4 types de peau et leur routine ---------- */
+    // Les phrases "why" reprennent les bienfaits annoncés sur les fiches produits du site.
+    const TYPES = {
+      acne: {
+        nom: "Peau à tendance acnéique",
+        intro: "Ta peau produit du sébum en excès et les pores ont tendance à s'obstruer : imperfections, points noirs, parfois des rougeurs. L'objectif est de nettoyer en profondeur sans agresser, et d'apaiser.",
+        routine: [
+          { etape: "Nettoyer", p: "gel", why: "Nettoie en douceur les peaux normales à grasses, resserre les pores et unifie le teint." },
+          { etape: "Tonifier", p: "lotion", why: "Tonifie, apaise les irritations et prépare la peau aux soins." },
+          { etape: "Apaiser", p: "serum", why: "Apaise les irritations et calme les peaux sensibles ou enflammées." },
+          { etape: "Hydrater et protéger", p: "creme", why: "Hydrate, resserre les pores et protège des UV et de la lumière bleue." }
+        ],
+        bonus: { p: "charbon", why: "En complément : un savon solide conçu pour les peaux grasses et acnéiques." },
+        conseil: "Évite de percer les boutons et de frotter ta peau : cela irrite et peut laisser des marques. En cas d'acné sévère ou persistante, consulte un dermatologue."
+      },
+      seche: {
+        nom: "Peau sèche",
+        intro: "Ta peau manque de lipides et d'eau : elle tiraille, peut être terne ou présenter des zones rugueuses. L'objectif est de nourrir, hydrater et réparer en douceur.",
+        routine: [
+          { etape: "Démaquiller et nettoyer", p: "huile", why: "Nettoie, protège de la pollution et nourrit la peau en un seul geste." },
+          { etape: "Tonifier", p: "lotion", why: "Améliore l'élasticité et réduit la sécheresse cutanée." },
+          { etape: "Réparer", p: "serum", why: "Répare et hydrate intensément les peaux sèches." },
+          { etape: "Hydrater et protéger", p: "creme", why: "Jusqu'à 72 heures d'hydratation, avec une protection contre les UV et la lumière bleue." }
+        ],
+        conseil: "Privilégie l'eau tiède plutôt que chaude et applique tes soins sur une peau encore légèrement humide pour retenir l'hydratation."
+      },
+      mature: {
+        nom: "Peau mature",
+        intro: "Avec le temps, le renouvellement cellulaire ralentit : rides, perte d'élasticité et teint moins lumineux apparaissent. L'objectif est de repulper, hydrater et protéger.",
+        routine: [
+          { etape: "Démaquiller et nettoyer", p: "huile", why: "Nettoyage en douceur, hydratation et nutrition intenses." },
+          { etape: "Tonifier", p: "lotion", why: "Améliore l'élasticité et révèle l'éclat naturel de la peau." },
+          { etape: "Régénérer", p: "serum", why: "Stimule le renouvellement cellulaire et repulpe les rides et ridules." },
+          { etape: "Hydrater et protéger", p: "creme", why: "Hydratation longue durée et protection contre les UV, première cause du vieillissement cutané." }
+        ],
+        conseil: "Applique ta protection chaque matin, même par temps nuageux : c'est le geste qui préserve le mieux la jeunesse de la peau."
+      },
+      grasse: {
+        nom: "Peau grasse",
+        intro: "Ta peau produit beaucoup de sébum : brillance, pores visibles, surtout sur le front, le nez et le menton. L'objectif est de nettoyer sans décaper, tout en gardant la peau hydratée.",
+        routine: [
+          { etape: "Nettoyer", p: "gel", why: "Nettoie en profondeur les peaux normales à grasses et resserre les pores." },
+          { etape: "Tonifier", p: "lotion", why: "Tonifie, hydrate et apaise sans alourdir." },
+          { etape: "Apaiser", p: "serum", optionnel: true, why: "Si ta peau est sensible ou irritée : apaise et hydrate sans graisser." },
+          { etape: "Hydrater et protéger", p: "creme", why: "Resserre les pores, affine le grain de peau et protège des UV et de la lumière bleue." }
+        ],
+        bonus: { p: "charbon", why: "En complément : un savon solide conçu pour les peaux grasses et acnéiques." },
+        conseil: "Ne décape pas ta peau : trop la dégraisser la pousse à produire encore plus de sébum. Une peau grasse a aussi besoin d'hydratation."
+      }
+    };
+
+    /* ---------- Questions : chaque réponse ajoute des points aux types concernés ---------- */
     const QUESTIONS = [
       {
         q: "Quelques heures après avoir nettoyé ton visage, ta peau…",
@@ -295,7 +298,7 @@
       {
         q: "Comment sont tes pores ?",
         options: [
-          { t: "Très visibles et dilatés sur toute la zone T", p: { grasse: 3 } },
+          { t: "Très visibles et dilatés sur la zone T", p: { grasse: 3 } },
           { t: "Dilatés, avec des points noirs et des boutons", p: { acne: 3 } },
           { t: "Presque invisibles", p: { seche: 2, mature: 1 } },
           { t: "Peu visibles, mais la peau est moins tonique", p: { mature: 2, seche: 1 } }
@@ -345,6 +348,8 @@
 
     const $ = (id) => document.getElementById(id);
     const accueil = $("accueil"), quiz = $("quiz"), resultat = $("resultat");
+    const fcfa = (n) => n.toLocaleString("fr-FR").replace(/ | /g, " ") + " FCFA";
+    const LABELS = { acne: "Acnéique", seche: "Sèche", mature: "Mature", grasse: "Grasse" };
 
     /* ---------- Questions ---------- */
     function showQuestion() {
@@ -386,7 +391,6 @@
       const totals = { acne: 0, seche: 0, mature: 0, grasse: 0 };
       const max = { acne: 0, seche: 0, mature: 0, grasse: 0 };
       QUESTIONS.forEach((q, qi) => {
-        // Maximum atteignable par type sur cette question (pour les pourcentages)
         Object.keys(totals).forEach((k) => {
           max[k] += Math.max(...q.options.map((o) => o.p[k] || 0));
         });
@@ -398,6 +402,19 @@
       const pct = {};
       Object.keys(totals).forEach((k) => (pct[k] = Math.round((totals[k] / max[k]) * 100)));
       return { totals, pct };
+    }
+
+    function productHtml(item, produit, extra) {
+      return '<li class="product">' +
+        '<img src="' + produit.img + '" alt="' + produit.nom + '" loading="lazy">' +
+        "<div>" +
+          '<div class="etape">' + (extra || item.etape || "Bonus") + (item.optionnel ? '<span class="optionnel">optionnel</span>' : "") + "</div>" +
+          "<h3>" + produit.nom + "</h3>" +
+          '<p class="compo">' + produit.compo + "</p>" +
+          '<p class="why">' + item.why + "</p>" +
+          '<div class="row"><span class="prix">' + fcfa(produit.prix) + "</span>" +
+          '<a class="lien" href="' + produit.url + '" target="_blank" rel="noopener">Voir sur narome-senegal.com →</a></div>' +
+        "</div></li>";
     }
 
     function showResult() {
@@ -412,25 +429,37 @@
       html += "<h2>" + t.nom + "</h2>";
       html += "<p>" + t.intro + "</p>";
 
-      // Mention d'un second profil si les scores sont proches
       if (totals[main] - totals[second] <= 2 && totals[second] > 0) {
-        html += '<div class="secondary-note">Ta peau présente aussi des signes de <strong>' +
-          TYPES[second].nom.toLowerCase() + "</strong>. Commence par la gamme ci-dessous et adapte selon ses réactions.</div>";
+        html += '<div class="note">Ta peau présente aussi des signes de <strong>' +
+          TYPES[second].nom.toLowerCase() + "</strong>. Commence par cette routine et adapte selon les réactions de ta peau.</div>";
       }
 
-      html += '<div class="gamme"><h3>Ta gamme : ' + t.gamme + "</h3><p>Actifs clés : " + t.actifs + "</p></div>";
-      html += "<h2>Ta routine</h2>";
-      html += '<ol class="routine">' + t.routine.map((r) =>
-        "<li><div><strong>" + r.nom + "</strong><small>" + r.detail + "</small></div></li>").join("") + "</ol>";
-      html += '<div class="secondary-note"><strong>Conseil :</strong> ' + t.conseil + "</div>";
+      html += "<h2>Ta routine Narome</h2>";
+      html += '<ol class="products" style="list-style:none">' +
+        t.routine.map((r) => productHtml(r, PRODUITS[r.p])).join("") + "</ol>";
+
+      // Total de la routine (hors produits optionnels et bonus)
+      const total = t.routine.filter((r) => !r.optionnel).reduce((s, r) => s + PRODUITS[r.p].prix, 0);
+      html += '<div class="total"><span>Total de la routine</span><span>' + fcfa(total) + "</span></div>";
+      let liv = total >= 25000 ? "Livraison gratuite (à partir de 25 000 FCFA d'achat)." : "Livraison gratuite à partir de 25 000 FCFA d'achat.";
+      html += '<p class="livraison">' + liv + " Offres relevées sur narome-senegal.com, elles peuvent évoluer.</p>";
+
+      if (t.bonus) {
+        html += '<div class="bonus"><h2>Pour aller plus loin</h2><ul class="products" style="list-style:none">' +
+          productHtml(t.bonus, PRODUITS[t.bonus.p], "Complément") + "</ul></div>";
+      }
+
+      html += '<div class="note"><strong>Conseil :</strong> ' + t.conseil + "</div>";
 
       html += '<div class="scores"><strong>Détail de ton profil</strong>' +
         ranked.map((k) =>
-          '<div class="score-row"><span>' + TYPES[k].nom.replace("Peau à tendance ", "").replace("Peau ", "").replace(/^./, (c) => c.toUpperCase()) +
+          '<div class="score-row"><span>' + LABELS[k] +
           '</span><div class="bar"><div style="width:' + pct[k] + '%"></div></div><span>' + pct[k] + "%</span></div>").join("") +
         "</div>";
 
-      html += '<div class="actions"><button id="restart" class="secondary">Refaire le diagnostic</button></div>';
+      html += '<div class="actions">' +
+        '<a class="btn" href="' + BASE + '/product-category/soins-visage/" target="_blank" rel="noopener">Voir tous les soins visage</a>' +
+        '<button id="restart" class="secondary">Refaire le diagnostic</button></div>';
       html += '<p class="disclaimer">Ce diagnostic est indicatif et ne remplace pas l\'avis d\'un dermatologue. Fais un test sur une petite zone avant d\'utiliser un nouveau produit.</p>';
 
       resultat.innerHTML = html;
