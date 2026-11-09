@@ -51,11 +51,16 @@
     p { margin: 0 0 16px; }
     .muted { color: var(--muted); }
 
-    .types {
-      list-style: none; padding: 0; margin: 20px 0 24px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    /* Simple texte (pas de fausses étiquettes cliquables) */
+    .types-line { margin: 0 0 24px; font-size: 0.95rem; }
+    .start-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+    .link-btn {
+      background: none; border: 0; padding: 0; color: var(--ink); font-weight: normal;
+      text-decoration: underline; cursor: pointer; font-size: 0.95rem;
     }
-    .types li { background: var(--soft); border-radius: 12px; padding: 12px 14px; font-size: 0.95rem; }
+    .link-btn:hover { background: none; color: var(--accent-hover); }
+    .chooser { display: grid; gap: 10px; margin: 16px 0 20px; }
+    .chooser button { text-align: left; }
 
     button, .btn {
       font: inherit;
@@ -116,8 +121,15 @@
     .prix { font-weight: bold; }
     .product a.lien { font-size: 0.9rem; color: var(--ink); }
     .optionnel { font-size: 0.7rem; background: var(--soft); border-radius: 99px; padding: 2px 8px; margin-left: 6px; text-transform: none; letter-spacing: 0; }
-    .total { display: flex; justify-content: space-between; font-weight: bold; padding: 16px 0 4px; font-size: 1.05rem; }
-    .livraison { font-size: 0.9rem; color: var(--muted); margin-bottom: 4px; }
+    .total { display: flex; justify-content: space-between; gap: 12px; font-weight: bold; padding: 16px 0 4px; font-size: 1.05rem; }
+    .total small { display: block; font-weight: normal; color: var(--muted); font-size: 0.8rem; }
+    .livraison { font-size: 0.9rem; color: var(--muted); margin: 0 0 4px; }
+    .livraison.ok { color: #1b6e3c; font-weight: bold; }
+    .order { margin: 16px 0 8px; padding: 18px; background: var(--soft); border-radius: var(--radius); }
+    .order .btn { width: 100%; text-align: center; font-size: 1.05rem; padding: 16px 26px; }
+    .order .btn.secondary { margin-top: 10px; font-size: 0.95rem; padding: 12px 26px; }
+    .order .hint { font-size: 0.82rem; color: var(--muted); margin: 10px 0 0; text-align: center; }
+    .perso { font-style: italic; }
     .bonus { margin-top: 24px; }
     .scores { margin: 24px 0 8px; }
     .score-row { display: grid; grid-template-columns: 110px 1fr 44px; gap: 10px; align-items: center; font-size: 0.9rem; margin-bottom: 6px; }
@@ -132,7 +144,6 @@
 
     @media (max-width: 420px) {
       .card { padding: 22px 16px; }
-      .types { grid-template-columns: 1fr; }
       .score-row { grid-template-columns: 90px 1fr 40px; }
       .product { grid-template-columns: 68px 1fr; }
       .product img { width: 68px; height: 68px; }
@@ -155,13 +166,24 @@
     <section id="accueil" class="card">
       <h1>Quelle routine Narome est faite pour ta peau&nbsp;?</h1>
       <p class="muted">Réponds à 7 questions rapides (moins de 2 minutes). Nous t'indiquons ton type de peau et les soins Narome qui lui correspondent.</p>
-      <ul class="types">
-        <li>Peau à tendance acnéique</li>
-        <li>Peau sèche</li>
-        <li>Peau mature</li>
-        <li>Peau grasse</li>
-      </ul>
-      <button id="start">Commencer le diagnostic</button>
+      <p class="types-line">Pour les peaux à tendance acnéique, sèches, matures ou grasses.</p>
+      <div class="start-actions">
+        <button id="start">Commencer le diagnostic</button>
+        <button type="button" class="link-btn" id="known">Je connais déjà mon type de peau</button>
+      </div>
+    </section>
+
+    <!-- Choix direct du type de peau -->
+    <section id="connu" class="card" hidden>
+      <h2>Quel est ton type de peau ?</h2>
+      <p class="muted">Choisis ton type pour voir directement la routine Narome qui lui correspond.</p>
+      <div class="chooser">
+        <button type="button" class="secondary" data-type="acne">Peau à tendance acnéique</button>
+        <button type="button" class="secondary" data-type="seche">Peau sèche</button>
+        <button type="button" class="secondary" data-type="mature">Peau mature</button>
+        <button type="button" class="secondary" data-type="grasse">Peau grasse</button>
+      </div>
+      <button type="button" class="link-btn" id="known-back">← Retour</button>
     </section>
 
     <!-- Questions -->
@@ -190,6 +212,10 @@
   <script>
     /* ---------- Produits Narome (relevés sur narome-senegal.com le 8 nov. 2026) ---------- */
     const BASE = "https://narome-senegal.com";
+    // Numéro WhatsApp de Narome au format international, sans + ni espaces.
+    // ⚠ À REMPLACER par le vrai numéro avant toute mise en ligne.
+    // Laisser vide ("") pour masquer le bouton « Commander ma routine ».
+    const WHATSAPP_NUMBER = "221771234567";
     const UP = BASE + "/wp-content/uploads/";
     const PRODUITS = {
       gel: {
@@ -280,35 +306,35 @@
       {
         q: "Quelques heures après avoir nettoyé ton visage, ta peau…",
         options: [
-          { t: "Tiraille ou est inconfortable", p: { seche: 3 } },
-          { t: "Brille, surtout sur le front, le nez et le menton", p: { grasse: 3, acne: 1 } },
-          { t: "Brille et se couvre d'imperfections", p: { acne: 3, grasse: 1 } },
-          { t: "Est plutôt normale, mais manque d'éclat et de fermeté", p: { mature: 3 } }
+          { t: "Tiraille ou est inconfortable", p: { seche: 3 }, r: "ta peau tiraille après le nettoyage" },
+          { t: "Brille, surtout sur le front, le nez et le menton", p: { grasse: 3, acne: 1 }, r: "ta peau brille quelques heures après le nettoyage, surtout sur la zone T" },
+          { t: "Brille et se couvre d'imperfections", p: { acne: 3, grasse: 1 }, r: "ta peau brille et se couvre d'imperfections" },
+          { t: "Est plutôt normale, mais manque d'éclat et de fermeté", p: { mature: 3 }, r: "ta peau manque d'éclat et de fermeté" }
         ]
       },
       {
         q: "Quelle est ta principale préoccupation ?",
         options: [
-          { t: "Les boutons, les points noirs, les marques", p: { acne: 3 } },
-          { t: "Les tiraillements, les zones rugueuses ou qui pèlent", p: { seche: 3 } },
-          { t: "Les rides, le relâchement, le teint terne", p: { mature: 3 } },
-          { t: "La brillance et les pores dilatés", p: { grasse: 3 } }
+          { t: "Les boutons, les points noirs, les marques", p: { acne: 3 }, r: "ce qui te préoccupe le plus, ce sont les boutons, les points noirs et les marques" },
+          { t: "Les tiraillements, les zones rugueuses ou qui pèlent", p: { seche: 3 }, r: "ce qui te gêne le plus, ce sont les tiraillements et les zones rugueuses" },
+          { t: "Les rides, le relâchement, le teint terne", p: { mature: 3 }, r: "ce qui te préoccupe le plus, ce sont les rides, le relâchement et le teint terne" },
+          { t: "La brillance et les pores dilatés", p: { grasse: 3 }, r: "ce qui te gêne le plus, c'est la brillance et les pores dilatés" }
         ]
       },
       {
         q: "Comment sont tes pores ?",
         options: [
-          { t: "Très visibles et dilatés sur la zone T", p: { grasse: 3 } },
-          { t: "Dilatés, avec des points noirs et des boutons", p: { acne: 3 } },
-          { t: "Presque invisibles", p: { seche: 2, mature: 1 } },
-          { t: "Peu visibles, mais la peau est moins tonique", p: { mature: 2, seche: 1 } }
+          { t: "Très visibles et dilatés sur la zone T", p: { grasse: 3 }, r: "tes pores sont très visibles sur la zone T" },
+          { t: "Dilatés, avec des points noirs et des boutons", p: { acne: 3 }, r: "tes pores sont dilatés, avec des points noirs et des boutons" },
+          { t: "Presque invisibles", p: { seche: 2, mature: 1 }, r: "tes pores sont presque invisibles" },
+          { t: "Peu visibles, mais la peau est moins tonique", p: { mature: 2, seche: 1 }, r: "tes pores sont peu visibles mais ta peau est moins tonique" }
         ]
       },
       {
         q: "À quelle fréquence as-tu des boutons ?",
         options: [
           { t: "Presque tout le temps, souvent inflammatoires", p: { acne: 3 } },
-          { t: "De temps en temps, avant les règles ou en période de stress", p: { grasse: 2, acne: 1 } },
+          { t: "De temps en temps, en période de stress ou de fatigue", p: { grasse: 2, acne: 1 } },
           { t: "Rarement", p: { seche: 1, mature: 1 } },
           { t: "Presque jamais", p: { seche: 1, mature: 1 } }
         ]
@@ -323,12 +349,14 @@
         ]
       },
       {
-        q: "En fin de journée, ton visage…",
+        // Question de sensibilité : elle ne change pas le type de peau,
+        // elle décide si le sérum apaisant est conseillé en priorité (s: true).
+        q: "Ta peau réagit-elle facilement (rougeurs, picotements) ?",
         options: [
-          { t: "Est brillant, le maquillage glisse", p: { grasse: 3 } },
-          { t: "Est inconfortable, des zones sèches apparaissent", p: { seche: 3 } },
-          { t: "Est terne et fatigué", p: { mature: 3 } },
-          { t: "Est brillant avec des rougeurs autour des boutons", p: { acne: 3 } }
+          { t: "Oui, souvent : rougeurs ou picotements avec beaucoup de produits", p: {}, s: true, r: "ta peau réagit facilement aux produits" },
+          { t: "Parfois, avec certains produits", p: {}, s: true, r: "ta peau réagit parfois à certains produits" },
+          { t: "Rarement", p: {} },
+          { t: "Presque jamais", p: {} }
         ]
       },
       {
@@ -347,7 +375,7 @@
     let current = 0;
 
     const $ = (id) => document.getElementById(id);
-    const accueil = $("accueil"), quiz = $("quiz"), resultat = $("resultat");
+    const accueil = $("accueil"), quiz = $("quiz"), resultat = $("resultat"), connu = $("connu");
     const fcfa = (n) => n.toLocaleString("fr-FR").replace(/ | /g, " ") + " FCFA";
     const LABELS = { acne: "Acnéique", seche: "Sèche", mature: "Mature", grasse: "Grasse" };
 
@@ -389,19 +417,54 @@
     /* ---------- Calcul du résultat ---------- */
     function computeScores() {
       const totals = { acne: 0, seche: 0, mature: 0, grasse: 0 };
-      const max = { acne: 0, seche: 0, mature: 0, grasse: 0 };
       QUESTIONS.forEach((q, qi) => {
-        Object.keys(totals).forEach((k) => {
-          max[k] += Math.max(...q.options.map((o) => o.p[k] || 0));
-        });
         const chosen = answers[qi];
         if (chosen === null) return;
         const pts = q.options[chosen].p;
         Object.keys(pts).forEach((k) => (totals[k] += pts[k]));
       });
+      return { totals, pct: toPercentages(totals) };
+    }
+
+    // Part de chaque type dans le total des points, arrondie pour faire exactement 100 %
+    // (méthode du plus grand reste).
+    function toPercentages(totals) {
+      const keys = Object.keys(totals);
+      const sum = keys.reduce((s, k) => s + totals[k], 0);
       const pct = {};
-      Object.keys(totals).forEach((k) => (pct[k] = Math.round((totals[k] / max[k]) * 100)));
-      return { totals, pct };
+      if (sum === 0) { keys.forEach((k) => (pct[k] = 0)); return pct; }
+      const exact = {};
+      keys.forEach((k) => {
+        exact[k] = (totals[k] / sum) * 100;
+        pct[k] = Math.floor(exact[k]);
+      });
+      let reste = 100 - keys.reduce((s, k) => s + pct[k], 0);
+      keys.slice().sort((a, b) => (exact[b] - pct[b]) - (exact[a] - pct[a]))
+        .forEach((k) => { if (reste > 0) { pct[k]++; reste--; } });
+      return pct;
+    }
+
+    // Phrase qui reprend les réponses de la cliente (questions 1, 2 et 3)
+    function phrasePerso() {
+      const parts = [0, 1, 2]
+        .map((qi) => (answers[qi] === null ? null : QUESTIONS[qi].options[answers[qi]].r))
+        .filter(Boolean);
+      if (!parts.length) return "";
+      // Points-virgules : certaines phrases contiennent déjà des virgules.
+      return "Tu nous as dit : " + parts.join(" ; ") + ".";
+    }
+
+    // La cliente a-t-elle indiqué une peau qui réagit facilement ?
+    function peauSensible() {
+      const qi = QUESTIONS.findIndex((q) => q.options.some((o) => o.s));
+      return qi >= 0 && answers[qi] !== null && !!QUESTIONS[qi].options[answers[qi]].s;
+    }
+
+    function messageWhatsApp(t, routine, total) {
+      const lignes = routine.map((r) => "- " + PRODUITS[r.p].nom + " (" + fcfa(PRODUITS[r.p].prix) + ")");
+      return "Bonjour Narome, j'ai fait le diagnostic de peau sur votre site : " + t.nom.toLowerCase() +
+        ".\nJe voudrais commander ma routine :\n" + lignes.join("\n") + "\nTotal : " + fcfa(total) +
+        "\nMerci de me confirmer la disponibilité et la livraison.";
     }
 
     function productHtml(item, produit, extra) {
@@ -417,32 +480,69 @@
         "</div></li>";
     }
 
-    function showResult() {
-      const { totals, pct } = computeScores();
-      // Tri décroissant ; en cas d'égalité, l'ordre acné > sèche > mature > grasse s'applique
-      const ranked = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
-      const main = ranked[0];
-      const second = ranked[1];
+    // forcedType : type choisi directement ("Je connais déjà mon type de peau"), sans quiz.
+    function showResult(forcedType) {
+      let ranked = null, totals = null, pct = null, main;
+      if (forcedType) {
+        main = forcedType;
+      } else {
+        ({ totals, pct } = computeScores());
+        // Tri décroissant ; en cas d'égalité, l'ordre acné > sèche > mature > grasse s'applique
+        ranked = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
+        main = ranked[0];
+      }
       const t = TYPES[main];
+      const sensible = !forcedType && peauSensible();
 
-      let html = '<span class="badge">Ton diagnostic</span>';
+      // Si la peau est sensible, le sérum apaisant n'est plus optionnel : il entre dans la routine et le total.
+      const routine = t.routine.map((r) => (r.optionnel && sensible ? Object.assign({}, r, { optionnel: false }) : r));
+      const aUnOptionnel = routine.some((r) => r.optionnel);
+
+      let html = '<span class="badge">' + (forcedType ? "Ta sélection" : "Ton diagnostic") + "</span>";
       html += "<h2>" + t.nom + "</h2>";
+      const perso = forcedType ? "" : phrasePerso();
+      if (perso) html += '<p class="perso">' + perso + "</p>";
       html += "<p>" + t.intro + "</p>";
 
-      if (totals[main] - totals[second] <= 2 && totals[second] > 0) {
-        html += '<div class="note">Ta peau présente aussi des signes de <strong>' +
-          TYPES[second].nom.toLowerCase() + "</strong>. Commence par cette routine et adapte selon les réactions de ta peau.</div>";
+      if (!forcedType) {
+        const second = ranked[1];
+        if (totals[main] - totals[second] <= 2 && totals[second] > 0) {
+          html += '<div class="note">Ta peau présente aussi des signes de <strong>' +
+            TYPES[second].nom.toLowerCase() + "</strong>. Commence par cette routine et adapte selon les réactions de ta peau.</div>";
+        }
+      }
+      if (sensible) {
+        html += '<div class="note">Ta peau réagit facilement : nous avons inclus le sérum apaisant dans ta routine. Teste chaque nouveau produit sur une petite zone avant de l\'utiliser.</div>';
       }
 
       html += "<h2>Ta routine Narome</h2>";
       html += '<ol class="products" style="list-style:none">' +
-        t.routine.map((r) => productHtml(r, PRODUITS[r.p])).join("") + "</ol>";
+        routine.map((r) => productHtml(r, PRODUITS[r.p])).join("") + "</ol>";
 
-      // Total de la routine (hors produits optionnels et bonus)
-      const total = t.routine.filter((r) => !r.optionnel).reduce((s, r) => s + PRODUITS[r.p].prix, 0);
-      html += '<div class="total"><span>Total de la routine</span><span>' + fcfa(total) + "</span></div>";
-      let liv = total >= 25000 ? "Livraison gratuite (à partir de 25 000 FCFA d'achat)." : "Livraison gratuite à partir de 25 000 FCFA d'achat.";
-      html += '<p class="livraison">' + liv + " Offres relevées sur narome-senegal.com, elles peuvent évoluer.</p>";
+      // Total de la routine (hors produits optionnels et bonus, et on le dit)
+      const total = routine.filter((r) => !r.optionnel).reduce((s, r) => s + PRODUITS[r.p].prix, 0);
+      html += '<div class="total"><span>Total de la routine' +
+        (aUnOptionnel ? "<small>hors sérum optionnel</small>" : "") + "</span><span>" + fcfa(total) + "</span></div>";
+      if (total >= 25000) {
+        html += '<p class="livraison ok">✓ Livraison offerte avec cette routine</p>';
+      } else {
+        html += '<p class="livraison">Plus que ' + fcfa(25000 - total) + " pour la livraison offerte (dès 25 000 FCFA d'achat).</p>";
+      }
+      html += '<p class="livraison">Prix et offres relevés sur narome-senegal.com, ils peuvent évoluer.</p>';
+
+      // Bouton de commande : WhatsApp (message pré-rempli) + lien vers le site
+      html += '<div class="order">';
+      if (WHATSAPP_NUMBER) {
+        // Le message ne liste que les produits comptés dans le total (pas le sérum optionnel)
+        const lien = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" +
+          encodeURIComponent(messageWhatsApp(t, routine.filter((r) => !r.optionnel), total));
+        html += '<a class="btn" id="order-wa" href="' + lien + '" target="_blank" rel="noopener">Commander ma routine</a>';
+        html += '<a class="btn secondary" href="' + BASE + '/product-category/soins-visage/" target="_blank" rel="noopener">Voir sur narome-senegal.com</a>';
+        html += '<p class="hint">La commande se fait par WhatsApp : ta routine et son total sont déjà écrits dans le message.</p>';
+      } else {
+        html += '<a class="btn" href="' + BASE + '/product-category/soins-visage/" target="_blank" rel="noopener">Voir sur narome-senegal.com</a>';
+      }
+      html += "</div>";
 
       if (t.bonus) {
         html += '<div class="bonus"><h2>Pour aller plus loin</h2><ul class="products" style="list-style:none">' +
@@ -451,20 +551,22 @@
 
       html += '<div class="note"><strong>Conseil :</strong> ' + t.conseil + "</div>";
 
-      html += '<div class="scores"><strong>Détail de ton profil</strong>' +
-        ranked.map((k) =>
-          '<div class="score-row"><span>' + LABELS[k] +
-          '</span><div class="bar"><div style="width:' + pct[k] + '%"></div></div><span>' + pct[k] + "%</span></div>").join("") +
-        "</div>";
+      if (ranked) {
+        html += '<div class="scores"><strong>Détail de ton profil</strong>' +
+          ranked.map((k) =>
+            '<div class="score-row"><span>' + LABELS[k] +
+            '</span><div class="bar"><div style="width:' + pct[k] + '%"></div></div><span>' + pct[k] + "%</span></div>").join("") +
+          "</div>";
+      }
 
-      html += '<div class="actions">' +
-        '<a class="btn" href="' + BASE + '/product-category/soins-visage/" target="_blank" rel="noopener">Voir tous les soins visage</a>' +
-        '<button id="restart" class="secondary">Refaire le diagnostic</button></div>';
+      html += '<div class="actions"><button id="restart" class="secondary">' +
+        (forcedType ? "Faire le diagnostic" : "Refaire le diagnostic") + "</button></div>";
       html += '<p class="disclaimer">Ce diagnostic est indicatif et ne remplace pas l\'avis d\'un dermatologue. Fais un test sur une petite zone avant d\'utiliser un nouveau produit.</p>';
 
       resultat.innerHTML = html;
       $("restart").addEventListener("click", restart);
       quiz.hidden = true;
+      connu.hidden = true;
       resultat.hidden = false;
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -483,6 +585,18 @@
       quiz.hidden = false;
       showQuestion();
     });
+
+    // « Je connais déjà mon type de peau » : on saute le quiz
+    $("known").addEventListener("click", () => {
+      accueil.hidden = true;
+      connu.hidden = false;
+    });
+    $("known-back").addEventListener("click", () => {
+      connu.hidden = true;
+      accueil.hidden = false;
+    });
+    document.querySelectorAll("#connu [data-type]").forEach((btn) =>
+      btn.addEventListener("click", () => showResult(btn.dataset.type)));
 
     $("form").addEventListener("submit", (e) => {
       e.preventDefault();

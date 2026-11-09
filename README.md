@@ -26,6 +26,26 @@ Le catalogue visage actuel de Narome ne contient pas de gammes séparées par
 type de peau : les routines sont construites à partir des bienfaits annoncés
 sur chaque fiche produit du site. À faire valider par la marque.
 
+## Commander
+Le bouton **Commander ma routine** ouvre WhatsApp avec un message déjà écrit
+(profil, produits, total). Un second bouton mène vers narome-senegal.com.
+Le numéro se règle dans la constante `WHATSAPP_NUMBER` en haut du script de
+`index.html` (format international, sans + ni espaces). Si elle est vide, le
+bouton WhatsApp est masqué.
+
+> ⚠ Le numéro actuel (+221 77 123 45 67) est un **numéro d'exemple** : il faut le
+> remplacer par le vrai numéro WhatsApp de Narome avant toute mise en ligne.
+
+Remplir le panier du site en un clic n'est pas prévu : le panier WooCommerce
+de narome-senegal.com n'accepte normalement qu'un produit par lien d'ajout
+(non testé sur le site réel). Pistes : un plugin côté Narome, ou héberger le
+quiz sur le site lui-même.
+
+## Sensibilité de la peau
+La question 6 demande si la peau réagit facilement. Elle ne change pas le type
+de peau : si la réponse est « oui », le sérum apaisant devient obligatoire dans
+la routine et entre dans le total (il est optionnel pour la peau grasse sinon).
+
 ## Données
 Noms, prix, compositions et images des produits sont relevés sur
 narome-senegal.com (8 novembre 2026). Les images sont chargées directement
